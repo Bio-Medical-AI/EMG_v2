@@ -1,0 +1,18 @@
+# configuration for wandb logger
+
+wandb:
+  _target_: lightning.pytorch.loggers.wandb.WandbLogger
+
+  offline: False
+  id: null
+
+  entity: 'my-wandb-name'
+  log_model: False
+  mode: 'online'
+  save_dir: ${paths.run_dir}
+
+  project: ${core.project_name} 
+  tags: ${core.tags} # tags should be in the most "out" project
+  group: ${core.group}
+
+  prefix: ""

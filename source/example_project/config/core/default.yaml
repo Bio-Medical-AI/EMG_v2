@@ -1,0 +1,9 @@
+# this is "project metadata"
+
+project_name: example_project
+tags: ['tag1', 'tag2', 'tag3']
+group: 'my_group'
+version: 1.0
+
+# seed for easy reproducebility
+seed:  2137

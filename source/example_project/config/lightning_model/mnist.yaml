@@ -1,0 +1,18 @@
+_target_: example_project.lightning_model.mnist_module.MNISTLitModule
+
+model: ${model}
+
+optimizer:
+  _target_: torch.optim.Adam
+  lr: 0.001
+  weight_decay: 0.0
+
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  mode: min
+  factor: 0.1
+  patience: 10
+
+
+# compile model for faster training with pytorch 2.0
+compile: false
