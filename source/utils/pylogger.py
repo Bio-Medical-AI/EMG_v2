@@ -1,5 +1,6 @@
 import logging
 from typing import Mapping, Optional
+
 from lightning_utilities.core.rank_zero import rank_prefixed_message, rank_zero_only
 
 
@@ -23,7 +24,6 @@ class RankedLogger(logging.LoggerAdapter):
         logger = logging.getLogger(name)
         super().__init__(logger=logger, extra=extra)
         self.rank_zero_only = rank_zero_only
-
 
     def log(self, level: int, msg: str, rank: Optional[int] = None, *args, **kwargs) -> None:
         """Delegate a log call to the underlying logger, after prefixing its message with the rank

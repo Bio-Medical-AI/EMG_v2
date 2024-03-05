@@ -3,15 +3,13 @@ from importlib.util import find_spec
 from typing import Any, Callable, Dict, Optional, Tuple
 
 from omegaconf import DictConfig
-
 from utils import pylogger, rich_utils
 
 logger = pylogger.RankedLogger(__name__, rank_zero_only=True)
 
 
 def extras(config: DictConfig) -> None:
-    """
-    Applies optional utilities before the task is started.
+    """Applies optional utilities before the task is started.
 
     Utilities:
         - Ignoring python warnings
@@ -99,9 +97,10 @@ def task_wrapper(task_func: Callable) -> Callable:
     return wrap
 
 
-def get_metric_value(metric_dict: Dict[str, Any], metric_name: Optional[str] = None) -> Optional[float]:
+def get_metric_value(
+    metric_dict: Dict[str, Any], metric_name: Optional[str] = None
+) -> Optional[float]:
     """Safely retrieves value of the metric logged in LightningModule.
-
 
     Args:
         metric_dict (Dict[str, Any]): A dict containing metric values.
