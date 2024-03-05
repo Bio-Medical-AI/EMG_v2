@@ -48,9 +48,33 @@ conda env create -f environment.yaml -n emg_env
 conda activate emg_env
 ```
 
+## How to download dataset
+
+```bash
+dvc pull [path to .dvc file]
+```
+
+example
+
+```bash
+dvc pull storage/CapgMyo.dvc
+```
+
+## How to prepare dataset for work
+
+```bash
+python -m download.data_import name=[Name of Dataset]
+```
+
+example
+
+```bash
+python -m download.data_import name=CapgMyo
+```
+
 ## How to run
 
-Train model with default configuration
+Train model with default configuration. You must be in **source** directory.
 
 ```bash
 # train on CPU

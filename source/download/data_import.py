@@ -1,146 +1,11 @@
-import argparse
 import os
-from pathlib import Path
-from typing import Callable
-from zipfile import ZipFile
 
-import gdown
 import hydra
 import numpy as np
 import pandas as pd
 import scipy.io
 from omegaconf import DictConfig
 from tqdm import tqdm
-
-
-def prepare_datasets(
-    prepare_dataset: Callable[[str, str, Callable[[], pd.DataFrame], str], None], final_path: str
-) -> None:
-    """Download and prepare 3 base datamodule.
-
-    Args:
-        prepare_dataset: function like: prepare_frame_dataset or prepare_dataframe_dataset
-        final_path: folder in which datamodule will be saved.
-    """
-    prepare_capgmyo(prepare_dataset, final_path)
-    prepare_ninapro(prepare_dataset, final_path)
-    prepare_myoarmband(prepare_dataset, final_path)
-
-
-def prepare_capgmyo(
-    prepare_dataset: Callable[[str, str, Callable[[], pd.DataFrame], str], None], final_path: str
-) -> None:
-    """Download and prepare CapgMyo dataset.
-
-    Args:
-        prepare_dataset: function like: prepare_frame_dataset or prepare_dataframe_dataset
-        final_path: folder in which datamodule will be saved.
-    """
-    prepare_dataset(
-        "CapgMyo", "1Xjtkr-rl2m3_80BvNg1wYSXN8yNaevZl", get_capgmyo_dataset, final_path
-    )
-
-
-def prepare_ninapro(
-    prepare_dataset: Callable[[str, str, Callable[[], pd.DataFrame], str], None], final_path: str
-) -> None:
-    """Download and prepare NinaPro dataset.
-
-    Args:
-        prepare_dataset: function like: prepare_frame_dataset or prepare_dataframe_dataset
-        final_path: folder in which datamodule will be saved.
-    """
-    prepare_dataset(
-        "NinaPro_1", "1BtNxCiGIqVWYiPtf0AxyZuTY0uz8j6we", get_ninapro_dataset, final_path
-    )
-
-
-def prepare_myoarmband(
-    prepare_dataset: Callable[[str, str, Callable[[], pd.DataFrame], str], None], final_path: str
-) -> None:
-    """Download and prepare MyoArmband dataset.
-
-    Args:
-        prepare_dataset: function like: prepare_frame_dataset or prepare_dataframe_dataset
-        final_path: folder in which datamodule will be saved.
-    """
-    prepare_dataset(
-        "MyoArmband", "1dO72tvtx5HOzZZ0C56IIUdCIVO3nNGt5", get_myoarmband_dataset, final_path
-    )
-
-
-def prepare_frame_dataset(
-    dataset_name: str,
-    file_id: str,
-    data_loading_function: Callable[[], pd.DataFrame],
-    final_folder: str,
-) -> None:
-    """Prepare dataset in form of separate files with arrays representing samples.
-
-    Args:
-        dataset_name: Name of dataset.
-        file_id: Identifier of dataset on Google Drive for download with gdown.
-        data_loading_function: Function that will return loaded dataset
-        final_folder: folder in which datamodule will be saved.
-    """
-    prepare_folders(dataset_name, file_id)
-    if not os.path.exists(final_folder):
-        os.makedirs(final_folder)
-    save_arrays(data_loading_function(), dataset_name, final_folder)
-
-
-def prepare_dataframe_dataset(
-    dataset_name: str,
-    file_id: str,
-    data_loading_function: Callable[[], pd.DataFrame],
-    final_folder: str,
-) -> None:
-    """Prepare dataset in form of dataframe stored as .pkl file.
-
-    Args:
-        dataset_name: Name of dataset.
-        file_id: Identifier of dataset on Google Drive for download with gdown.
-        data_loading_function: Function that will return loaded dataset
-        final_folder: folder in which datamodule will be saved.
-    """
-    prepare_folders(dataset_name, file_id)
-    if not os.path.exists(final_folder):
-        os.makedirs(final_folder)
-    subfolder = os.path.join(final_folder, dataset_name)
-    if not os.path.exists(subfolder):
-        os.makedirs(subfolder)
-    data_loading_function().to_pickle(
-        os.path.join(final_folder, dataset_name, f"{dataset_name}.pkl")
-    )
-
-
-def prepare_folders(dataset_name: str, file_id: str) -> None:
-    """Prepare folders for storing data, downloads and extracts data into them.
-
-    Args:
-        dataset_name: Name of dataset.
-        file_id: Identifier of dataset on Google Drive for download with gdown.
-    """
-    if not os.path.exists(os.getenv("STORAGE_DIR")):
-        os.makedirs(os.getenv("STORAGE_DIR"))
-    destined_folder = os.path.join(os.getenv("STORAGE_DIR"), dataset_name)
-    if not os.path.exists(destined_folder):
-        os.makedirs(destined_folder)
-    zip_file = os.path.join(destined_folder, dataset_name + ".zip")
-    if not os.path.exists(zip_file):
-        import_datasets(zip_file, file_id)
-        with ZipFile(zip_file, "r") as zObject:
-            zObject.extractall(destined_folder)
-
-
-def import_datasets(destination: str, id: str) -> None:
-    """Download compressed data files from Google Drive.
-
-    Args:
-        destination: Path of file to which download compressed dataset.
-        id: Identifier of dataset on Google Drive for download with gdown.
-    """
-    gdown.download(id=id, output=destination, quiet=False)
 
 
 def extract_data(relative_path: bytes or str, name: str) -> np.ndarray:
@@ -154,17 +19,6 @@ def extract_data(relative_path: bytes or str, name: str) -> np.ndarray:
     """
     path = os.path.join(os.getenv("STORAGE_DIR"), relative_path)
     return np.array(scipy.io.loadmat(path)[name])
-
-
-def get_absolute_path(relative_path: bytes or str) -> bytes or str:
-    """
-    Get Absolute path from relative_path
-    Args:
-        relative_path: Relative path (in relation to current file)
-
-    Returns: Absolute path
-    """
-    return os.path.join(Path(os.path.abspath(__file__)).parent, relative_path)
 
 
 def get_capgmyo_dataset() -> pd.DataFrame:
@@ -432,9 +286,7 @@ def main(config: DictConfig):
     Returns:
         Optional[float]: Optimized metric value.
     """
-    prepare_frame_dataset(
-        config.name, config.gdrive_id, DOWNLOADS[config.name], os.getenv("DATA_DIR")
-    )
+    save_arrays(DOWNLOADS[config.name](), config.name, os.getenv("DATA_DIR"))
 
 
 if __name__ == "__main__":
