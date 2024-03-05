@@ -1,6 +1,7 @@
 # storage
 storage/*
 !storage/.gitkeep
+!*.dvc
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
