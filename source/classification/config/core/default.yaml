@@ -1,0 +1,9 @@
+# this is "project metadata"
+
+project_name: EMG_analysis
+tags: ["EMG", "2024"]
+group: "Mateusz Grzesiuk"
+version: 2.0
+
+# seed for easy reproducebility
+seed: 2137

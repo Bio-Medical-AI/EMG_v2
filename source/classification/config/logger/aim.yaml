@@ -7,7 +7,7 @@
 # `aim up`
 
 aim:
-  _target_: aim.pytorch_lightning.AimLogger
+  _target_: aim.lightning.AimLogger
   repo: ${paths.root_dir} # .aim folder will be created here
   # repo: "aim://ip_address:port" # can instead provide IP address pointing to Aim remote tracking server which manages the repo, see https://aimstack.readthedocs.io/en/latest/using/remote_tracking.html#
 

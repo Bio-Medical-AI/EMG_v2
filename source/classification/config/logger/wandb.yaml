@@ -6,12 +6,12 @@ wandb:
   offline: False
   id: null
 
-  entity: 'my-wandb-name'
+  entity: "biomedical-ai"
   log_model: False
-  mode: 'online'
+  mode: "online"
   save_dir: ${paths.run_dir}
 
-  project: ${core.project_name} 
+  project: ${core.project_name}
   tags: ${core.tags} # tags should be in the most "out" project
   group: ${core.group}
 

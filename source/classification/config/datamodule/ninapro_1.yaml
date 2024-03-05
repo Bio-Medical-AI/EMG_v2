@@ -1,0 +1,53 @@
+_target_: classification.datamodule.AbstractDataModule
+
+name: "NinaPro_1"
+window_length: 1
+width: 1 # Must be equal to window_length
+height: 10
+channels: 1
+num_classes: 52
+k_folds: 10
+split_method: "subject"
+source_name: "path"
+target_name: "label"
+series_name: "spectrogram"
+subject_name: "subject"
+split_name: "split"
+batch_size: 12
+num_workers: 8
+shuffle_train: True
+seed: 2137
+
+datasets:
+  train:
+    _target_: classification.dataset.SpectrogramDataset
+    preload: true
+    transform:
+      _target_: torchvision.transforms.Compose
+      transforms:
+        - _target_: torchvision.transforms.ToTensor
+        - _target_: torchvision.transforms.Normalize
+          mean: 0
+          std: 1
+
+  val:
+    _target_: classification.dataset.SpectrogramDataset
+    preload: true
+    transform:
+      _target_: torchvision.transforms.Compose
+      transforms:
+        - _target_: torchvision.transforms.ToTensor
+        - _target_: torchvision.transforms.Normalize
+          mean: 0
+          std: 1
+
+  test:
+    _target_: classification.dataset.SpectrogramDataset
+    preload: false
+    transform:
+      _target_: torchvision.transforms.Compose
+      transforms:
+        - _target_: torchvision.transforms.ToTensor
+        - _target_: torchvision.transforms.Normalize
+          mean: 0
+          std: 1

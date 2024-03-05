@@ -34,7 +34,7 @@ defaults:
   # training related
   # ===================================================================================
   - trainer: default
-  - callbacks: null 
+  - callbacks: null
 
 task_name: "eval"
 

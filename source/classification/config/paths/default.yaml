@@ -6,7 +6,7 @@
 root_dir: ${oc.env:PROJECT_ROOT}
 # directory for the data
 data_dir: ${oc.env:DATA_DIR}
-# dir for the storage 
+# dir for the storage
 storage_dir: ${oc.env:PROJECT_STORAGE_DIR}
 # directory for the hydr
 hydra_output_dir: "${oc.env:PROJECT_STORAGE_DIR}/outputs"
@@ -14,13 +14,10 @@ hydra_output_dir: "${oc.env:PROJECT_STORAGE_DIR}/outputs"
 # this is a dir for run, it's made by Hydra
 run_dir: ${hydra:runtime.output_dir}
 checkpoints_dir: "${paths.run_dir}/checkpoints"
-
 # structure of the logs
-
 
 # root_dir: ${oc.env:PROJECT_ROOT}
 # storage_dir: ${oc.env:STORAGE_DIR}
-
 
 # # path to data directory
 # data_dir: ${oc.env:DATA_DIR}

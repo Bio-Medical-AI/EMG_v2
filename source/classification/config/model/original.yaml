@@ -1,0 +1,6 @@
+_target_: classification.model.original_model.OriginalModel
+
+num_classes: ${datamodule.num_classes}
+input_width: ${datamodule.width}
+input_height: ${datamodule.height}
+channels: ${datamodule.channels}
