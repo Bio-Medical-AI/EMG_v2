@@ -1,7 +1,7 @@
 # storage
 storage/*
 !storage/.gitkeep
-!storage/data/CapgMyo.dvc
+!storage/*.dvc
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
