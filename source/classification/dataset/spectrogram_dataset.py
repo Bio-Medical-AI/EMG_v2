@@ -19,6 +19,7 @@ class SpectrogramDataset(AbstractDataset):
         series_name: str = "spectrogram",
         preload: bool = True,
         progress: CustomProgress = None,
+        visualize_progress: bool = False,
         window_length: int = 1,
     ):
         """
@@ -28,14 +29,29 @@ class SpectrogramDataset(AbstractDataset):
             source_name: Name of column in dataframe with data samples
             target_name: Name of column in dataframe with target classes
             series_name: Name of column in dataframe with series ID
+            preload: Should dataset be preloaded into ram memory?
+            progress: Object from trainer responsible for displaying progressbar
+            visualize_progress: Should preloading progress be visualized?
             window_length: length of series of data
         """
         super().__init__(
-            data_frame, transform, source_name, target_name, series_name, preload, progress
+            data_frame,
+            transform,
+            source_name,
+            target_name,
+            series_name,
+            preload,
+            progress,
+            visualize_progress,
         )
         self.window_length = window_length
 
     def __getitem__(self, index: int) -> dict:
+        """Get one item from dataset under given index.
+
+        Args:
+            index: ndex of element in dataset
+        """
         label = int(self.labels.iloc[index])
         series = self.series.iloc[index]
         data = np.squeeze(np.dstack(self._get_window(index, self.window_length)))
@@ -46,6 +62,7 @@ class SpectrogramDataset(AbstractDataset):
         return {"data": data, "label": label, "spectrograms": series, "index": index}
 
     def __len__(self) -> int:
+        """Get length of dataset."""
         return self.samples_amount
 
     def _get_window(self, index: int, length: int) -> list[np.ndarray]:

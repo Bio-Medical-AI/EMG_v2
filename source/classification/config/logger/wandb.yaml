@@ -6,7 +6,7 @@ wandb:
   offline: False
   id: null
 
-  entity: "biomedical-ai"
+  entity: null
   log_model: False
   mode: "online"
   save_dir: ${paths.run_dir}

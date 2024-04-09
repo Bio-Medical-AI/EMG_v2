@@ -20,6 +20,7 @@ class AbstractDataset(Dataset):
         series_name: str = "spectrogram",
         preload: bool = True,
         progress: CustomProgress = None,
+        visualize_progress: bool = False,
     ):
         """
         Args:
@@ -28,13 +29,17 @@ class AbstractDataset(Dataset):
             source_name: Name of column in dataframe with data samples
             target_name: Name of column in dataframe with target classes
             series_name: Name of column in dataframe with series ID
+            preload: Should dataset be preloaded into ram memory?
+            progress: Object from trainer responsible for displaying progressbar
+            visualize_progress: Should preloading progress be visualized?
         """
         self.preload = preload
         self.records: pd.Series = data_frame[source_name]
         self.progress: CustomProgress = progress
+        self.visualize_progress = visualize_progress
 
         if self.preload:
-            if self.progress is not None:
+            if self.progress is not None and self.visualize_progress:
                 task = self.progress.add_task("[cyan]Preloading", total=self.records.size)
                 self.records = self.records.apply(lambda x: progress_load(x, task, self.progress))
             else:
@@ -51,7 +56,9 @@ class AbstractDataset(Dataset):
             Mean and Std
         """
         if not self.preload:
-            mean, std = calculate_mean_std(self.records.tolist(), self.progress)
+            mean, std = calculate_mean_std(
+                self.records.tolist(), self.progress if self.visualize_progress else None
+            )
         else:
             values = np.stack([item for _, item in self.records.items()])
             mean, std = np.mean(values), np.std(values)
@@ -73,6 +80,11 @@ class AbstractDataset(Dataset):
             self.transform.transforms[norm_idx].std = std
 
     def __getitem__(self, index: int) -> dict:
+        """Get one item from dataset under given index.
+
+        Args:
+            index: ndex of element in dataset
+        """
         label = torch.tensor(self.labels.iloc[index]).long()
         series = torch.tensor(self.series.iloc[index]).long()
         out_index = torch.tensor(index).long()
@@ -85,4 +97,5 @@ class AbstractDataset(Dataset):
         return {"data": data, "label": label, "spectrograms": series, "index": out_index}
 
     def __len__(self) -> int:
+        """Get length of dataset."""
         return self.samples_amount
