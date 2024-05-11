@@ -21,7 +21,7 @@ seed: 2137
 datasets:
   train:
     _target_: classification.dataset.SpectrogramDataset
-    preload: true
+    preload: false
     visualize_progress: false
     transform:
       _target_: torchvision.transforms.Compose
@@ -33,7 +33,7 @@ datasets:
 
   val:
     _target_: classification.dataset.SpectrogramDataset
-    preload: true
+    preload: false
     visualize_progress: false
     transform:
       _target_: torchvision.transforms.Compose
@@ -45,7 +45,7 @@ datasets:
 
   test:
     _target_: classification.dataset.SpectrogramDataset
-    preload: true
+    preload: false
     visualize_progress: false
     transform:
       _target_: torchvision.transforms.Compose
