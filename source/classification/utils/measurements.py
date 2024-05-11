@@ -54,35 +54,26 @@ def calculate_mean_std(
     Returns:
         tuple of mean and std
     """
-    # Initialize variables to accumulate sum and count
     total_sum = 0
     total_count = 0
-    total_squared_sum = 0
 
     if progress is not None:
-        task = progress.add_task("[cyan]Calculating Mean and Std", total=len(file_paths))
-    # Iterate through each file path
+        task = progress.add_task("[cyan]Calculating Mean", total=len(file_paths))
     for file_path in file_paths:
-        # Load the ndarray from file
         arr = np.load(file_path)
-
-        # Calculate sum, count, and squared sum
-        arr_sum = np.sum(arr)
-        arr_count = np.size(arr)
-        arr_squared_sum = np.sum(arr**2)
-
-        # Accumulate sum and count
-        total_sum += arr_sum
-        total_count += arr_count
-        total_squared_sum += arr_squared_sum
+        total_sum += np.sum(arr)
+        total_count += np.size(arr)
         if progress is not None:
             progress.update(task, advance=1)
-
-    # Calculate mean
     mean = total_sum / total_count
-
-    # Calculate variance and standard deviation
-    variance = (total_squared_sum / total_count) - (mean**2)
-    std_deviation = np.sqrt(variance)
+    total_sum = 0
+    if progress is not None:
+        task = progress.add_task("[cyan]Calculating Std and Std", total=len(file_paths))
+    for file_path in file_paths:
+        arr = np.load(file_path)
+        total_sum += np.sum((arr - mean) ** 2)
+        if progress is not None:
+            progress.update(task, advance=1)
+    std_deviation = np.sqrt(total_sum / total_count)
 
     return mean, std_deviation

@@ -62,9 +62,15 @@ class AbstractDataModule(L.LightningDataModule):
         self.datasets = {}
 
     def prepare_data(self) -> None:
+        """Downloading and saving data."""
         self.data = pd.read_csv(self.df_path)
 
     def setup(self, stage: Optional[str] = None) -> None:
+        """Called at the beginning of fit (train + validate), validate, test, or predict.
+
+        This is a good hook when you need to build models dynamically or adjust something about
+        them. This hook is called on every process when using DDP
+        """
         if stage == TrainerFn.TESTING:
             self.datasets = {}
         self.split_data(stage)
@@ -103,9 +109,25 @@ class AbstractDataModule(L.LightningDataModule):
                         self.splits["rest"],
                         (
                             self.data.iloc[self.splits["rest"]][self.hparams.subject_name]
-                            * self.data.iloc[self.splits["rest"]][self.hparams.target_name].max()
+                            * (
+                                self.data.iloc[self.splits["rest"]][self.hparams.target_name].max()
+                                + 1
+                            )
                             + self.data.iloc[self.splits["rest"]][self.hparams.target_name]
                         ),
+                    )
+                elif self.hparams.split_method == "equal_trial":
+                    self.skf = StratifiedKFold(n_splits=self.hparams.k_folds).split(
+                        self.splits["rest"],
+                        (
+                            self.data.iloc[self.splits["rest"]][self.hparams.subject_name]
+                            * (
+                                self.data.iloc[self.splits["rest"]][self.hparams.target_name].max()
+                                + 1
+                            )
+                            + self.data.iloc[self.splits["rest"]][self.hparams.target_name]
+                        ),
+                        self.data.iloc[self.splits["rest"]][self.hparams.series_name],
                     )
                 else:
                     self.skf = KFold(n_splits=self.hparams.k_folds).split(self.splits["rest"])
@@ -124,6 +146,7 @@ class AbstractDataModule(L.LightningDataModule):
             self.splits["val"] = self.splits["rest"][test_index]
 
     def train_dataloader(self) -> DataLoader:
+        """Get Training dataloader."""
         if "train" not in self.datasets.keys():
             progress = get_progress_callback(self.trainer)
             self.datasets["train"] = hydra.utils.call(
@@ -146,6 +169,7 @@ class AbstractDataModule(L.LightningDataModule):
         )
 
     def val_dataloader(self) -> DataLoader:
+        """Get Validation dataloader."""
         if "val" not in self.datasets.keys():
             progress = get_progress_callback(self.trainer)
             self.datasets["val"] = hydra.utils.call(
@@ -166,6 +190,7 @@ class AbstractDataModule(L.LightningDataModule):
         )
 
     def test_dataloader(self) -> DataLoader:
+        """Get Test dataloader."""
         progress = get_progress_callback(self.trainer)
         dataset = hydra.utils.call(
             self.hparams.datasets.test,

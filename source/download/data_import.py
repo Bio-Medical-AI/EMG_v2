@@ -92,7 +92,6 @@ def get_ninapro_dataset() -> pd.DataFrame:
     labels = []
     series = []
     subjects = []
-    splits = []
     last_series = -1
     for subject in range(1, 28):
         start_gest = 0
@@ -103,7 +102,6 @@ def get_ninapro_dataset() -> pd.DataFrame:
             gesture = extract_data(
                 os.path.join("NinaPro_1", f"S{str(subject)}_A1_E{str(session)}.mat"), "stimulus"
             )
-            split = "test" if session % 3 == 0 else "train"
             recordings.extend([d.reshape(10, -1) for d in data])
             proper_gesture = [(g if g == 0 else g + start_gest) for g in gesture[:, 0]]
             start_gest = max(proper_gesture)
@@ -118,18 +116,23 @@ def get_ninapro_dataset() -> pd.DataFrame:
                 series.append(counter)
             last_series = counter
             subjects.extend([subject for _ in range(gesture.shape[0])])
-            splits.extend([split for _ in range(gesture.shape[0])])
     df = pd.DataFrame(
         {
             "record": recordings,
             "label": labels,
             "spectrogram": series,
             "subject": subjects,
-            "split": splits,
         }
     )
     df = df.loc[df["label"] != 0]
     df["label"] = df["label"] - 1
+    series_test = []
+    for label in set(labels):
+        for subject in set(subjects):
+            tmp: pd.DataFrame = df[df["label"] == label]
+            tmp = tmp[tmp["subject"] == subject]
+            series_test.extend(tmp["spectrogram"].unique()[2::3])
+    df["split"] = df["spectrogram"].isin(series_test).apply(lambda x: "test" if x else "train")
     df.reset_index(inplace=True)
     return df
 
