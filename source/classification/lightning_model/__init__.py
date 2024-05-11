@@ -1,1 +1,2 @@
+from classification.lightning_model.biometric_classifier import BiometricClassifier
 from classification.lightning_model.classifier import Classifier

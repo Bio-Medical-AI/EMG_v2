@@ -1,2 +1,3 @@
 from classification.dataset.abstract_dataset import AbstractDataset
+from classification.dataset.biometric_dataset import BiometricDataset
 from classification.dataset.spectrogram_dataset import SpectrogramDataset

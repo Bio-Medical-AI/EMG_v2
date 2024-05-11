@@ -1,1 +1,2 @@
 from classification.datamodule.abstract_datamodule import AbstractDataModule
+from classification.datamodule.biometric_datamodule import BiometricDataModule
